@@ -26,7 +26,7 @@ export function LoginForm({ onLogin }) {
       <form className="login-card" onSubmit={handleSubmit} autoComplete="off">
 
         <div className="login-logo">
-          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <svg width="46" height="46" viewBox="0 0 36 36" fill="none">
             <rect width="36" height="36" rx="10" fill="#1a1a1a" stroke="#2a2a2a"/>
             <rect x="10" y="6" width="10" height="16" rx="2" stroke="#c0c0c0" strokeWidth="1.5"/>
             <rect x="16" y="14" width="10" height="16" rx="2" fill="#1a1a1a" stroke="#888" strokeWidth="1.5"/>
