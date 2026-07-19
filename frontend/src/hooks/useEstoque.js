@@ -41,10 +41,15 @@ export function useEstoque() {
         method: 'PUT',
         body: JSON.stringify({ status: statusAtual === 'Vendido' ? 'Em estoque' : 'Vendido' }),
       });
-      if (!res.ok) throw new Error(`Erro ${res.status}`);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.mensagem || `Erro ${res.status}`);
+      }
       await sincronizar();
+      return { ok: true };
     } catch (err) {
       console.error('Erro ao alterar status:', err);
+      return { ok: false, mensagem: err.message };
     }
   };
 
@@ -54,22 +59,30 @@ export function useEstoque() {
         method: 'PUT',
         body: JSON.stringify({ status: 'Vendido', clienteVenda, dataVenda: new Date().toISOString() }),
       });
-      if (!res.ok) throw new Error(`Erro ${res.status}`);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.mensagem || `Erro ${res.status}`);
+      }
       await sincronizar();
       return { ok: true };
     } catch (err) {
       console.error('Erro ao vender:', err);
-      return { ok: false };
+      return { ok: false, mensagem: err.message };
     }
   };
 
   const excluirAparelho = async (id) => {
     try {
       const res = await apiFetch(`/estoque/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error(`Erro ${res.status}`);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.mensagem || `Erro ${res.status}`);
+      }
       await sincronizar();
+      return { ok: true };
     } catch (err) {
       console.error('Erro ao excluir:', err);
+      return { ok: false, mensagem: err.message };
     }
   };
 

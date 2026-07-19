@@ -61,21 +61,23 @@ function App() {
   };
 
   const handleAlterarStatus = async (id, statusAtual) => {
-    await alterarStatus(id, statusAtual);
-    toast.success('Status atualizado!');
+    const resultado = await alterarStatus(id, statusAtual);
+    if (resultado.ok) toast.success('Status atualizado!');
+    else toast.error(`Erro: ${resultado.mensagem}`);
   };
 
   const handleVender = async (id, clienteVenda) => {
     const resultado = await venderAparelho(id, clienteVenda);
     if (resultado.ok) toast.success(`Registrado para ${clienteVenda}!`);
-    else toast.error('Erro ao registrar');
+    else toast.error(`Erro: ${resultado.mensagem}`);
   };
 
   const handleExcluir = (id) => setConfirmando(id);
 
   const confirmarExclusao = async () => {
-    await excluirAparelho(confirmando);
-    toast.success('Aparelho excluído!');
+    const resultado = await excluirAparelho(confirmando);
+    if (resultado.ok) toast.success('Aparelho excluído!');
+    else toast.error(`Erro: ${resultado.mensagem}`);
     setConfirmando(null);
   };
 

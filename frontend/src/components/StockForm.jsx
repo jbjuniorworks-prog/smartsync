@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { comprimirImagem } from '../utils/formatters';
+import { comprimirImagem, validarImei } from '../utils/formatters';
 
 export function StockForm({ onSalvar }) {
   const [form, setForm] = useState({
@@ -15,13 +15,15 @@ export function StockForm({ onSalvar }) {
 
   const set = (campo) => (e) => setForm({ ...form, [campo]: e.target.value });
 
-  const imeiValido = /^\d{15}$/.test(form.imei);
+  const imeiValido = validarImei(form.imei);
   const camposValidos = form.cliente && form.aparelho && form.imei && form.preco && imeiValido;
 
   const handleImei = (e) => {
     const val = e.target.value.replace(/\D/g, '').slice(0, 15);
     setForm({ ...form, imei: val });
-    setErroImei(val.length > 0 && val.length < 15 ? `${val.length}/15 dígitos` : '');
+    if (val.length === 0)      setErroImei('');
+    else if (val.length < 15)  setErroImei(`${val.length}/15 dígitos`);
+    else                       setErroImei(validarImei(val) ? '' : 'IMEI inválido');
   };
 
   const handleCpf = (e) => {

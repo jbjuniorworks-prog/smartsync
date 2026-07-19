@@ -1,6 +1,19 @@
 export const formatarMoeda = (v) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
+// Valida IMEI: 15 dígitos + checksum de Luhn (mesma regra do backend).
+export const validarImei = (imei) => {
+  const n = String(imei).trim();
+  if (!/^\d{15}$/.test(n)) return false;
+  let soma = 0;
+  for (let i = 0; i < 15; i++) {
+    let d = Number(n[i]);
+    if (i % 2 !== 0) { d *= 2; if (d > 9) d -= 9; }
+    soma += d;
+  }
+  return soma % 10 === 0;
+};
+
 export const formatarData = (data) => {
   if (!data) return '—';
   const d = new Date(data);

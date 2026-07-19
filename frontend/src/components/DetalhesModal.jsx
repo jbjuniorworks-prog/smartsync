@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { formatarMoeda, formatarData } from '../utils/formatters';
 import { apiFetch } from '../api';
 
@@ -92,11 +93,16 @@ export function DetalhesModal({ item, onClose, onAtualizar, isAdmin, buscarHisto
         method: 'PUT',
         body: JSON.stringify({ [campo]: dados[campo] }),
       });
-      if (!res.ok) throw new Error(`Erro ${res.status}`);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.mensagem || `Erro ${res.status}`);
+      }
       await onAtualizar();
       setEditando(null);
+      toast.success('Alteração salva!');
     } catch (err) {
       console.error('Erro ao salvar campo:', err);
+      toast.error(`Erro ao salvar: ${err.message}`);
     } finally {
       setSalvando(false);
     }
