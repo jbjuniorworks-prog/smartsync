@@ -49,8 +49,9 @@ export function LoginForm({ onLogin }) {
         </div>
 
         <div className="login-field">
-          <label className="login-label">Usuário</label>
+          <label className="login-label" htmlFor="login-usuario">Usuário</label>
           <input
+            id="login-usuario"
             type="text"
             placeholder="Digite seu usuário"
             value={nome}
@@ -61,8 +62,9 @@ export function LoginForm({ onLogin }) {
         </div>
 
         <div className="login-field">
-          <label className="login-label">Senha</label>
+          <label className="login-label" htmlFor="login-senha">Senha</label>
           <input
+            id="login-senha"
             type="password"
             placeholder="Digite sua senha"
             value={senha}

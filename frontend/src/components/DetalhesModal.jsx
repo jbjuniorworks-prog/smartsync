@@ -165,7 +165,7 @@ export function DetalhesModal({ item, onClose, onAtualizar, isAdmin, buscarHisto
           </span>
         </div>
 
-        <button className="modal-close" onClick={onClose}>✕</button>
+        <button className="modal-close" aria-label="Fechar" onClick={onClose}>✕</button>
 
         <div className="modal-abas">
           <button className={`modal-aba ${abaAtiva === 'detalhes'  ? 'ativa' : ''}`} onClick={() => setAbaAtiva('detalhes')}>🔧 Serviço</button>

@@ -915,4 +915,7 @@ body {
   .login-card { padding: 40px 26px; margin: 0 10px; }
   .login-logo-text { font-size: 2.2rem; }
   .header-user-info { display: none; }
+  .modal-abas { gap: 0; }
+  .modal-aba { padding: 8px 10px; font-size: 0.82rem; }
+  .cpf-cliente-banner { padding: 10px 12px; }
 }

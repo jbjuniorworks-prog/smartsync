@@ -116,7 +116,7 @@ export function StockCard({ item, onAlterarStatus, onVender, onExcluir, onImprim
               {loadingStatus ? <span className="btn-spinner" /> : concluido ? '↩ Reabrir' : '✓ Concluir'}
             </button>
             <button className="btn-recibo" onClick={(e) => { e.stopPropagation(); onImprimir(item); }}>🖨 Recibo</button>
-            <button className="btn-del" onClick={(e) => { e.stopPropagation(); onExcluir(item.id); }}>🗑</button>
+            <button className="btn-del" aria-label="Excluir aparelho" onClick={(e) => { e.stopPropagation(); onExcluir(item.id); }}>🗑</button>
           </div>
         )}
 

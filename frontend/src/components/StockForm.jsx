@@ -90,15 +90,16 @@ export function StockForm({ onSalvar }) {
       <form onSubmit={handleSubmit} className="grid-form">
 
         {/* Linha 1 — dados do cliente */}
-        <input value={form.cliente} onChange={set('cliente')} placeholder="Cliente *" />
-        <input value={form.cpf} onChange={handleCpf} placeholder="CPF (p/ localizar)" />
-        <input value={form.telefone} onChange={handleTelefone} placeholder="Telefone (p/ localizar)" />
+        <input aria-label="Nome do cliente" value={form.cliente} onChange={set('cliente')} placeholder="Cliente *" />
+        <input aria-label="CPF do cliente" value={form.cpf} onChange={handleCpf} placeholder="CPF (p/ localizar)" />
+        <input aria-label="Telefone do cliente" value={form.telefone} onChange={handleTelefone} placeholder="Telefone (p/ localizar)" />
 
         {/* Linha 2 — dados do aparelho */}
-        <input value={form.aparelho} onChange={set('aparelho')} placeholder="Aparelho *" />
+        <input aria-label="Aparelho / modelo" value={form.aparelho} onChange={set('aparelho')} placeholder="Aparelho *" />
 
         <div className="input-wrapper">
           <input
+            aria-label="IMEI (15 dígitos)"
             value={form.imei}
             onChange={handleImei}
             placeholder="IMEI (15 dígitos) *"
@@ -109,6 +110,7 @@ export function StockForm({ onSalvar }) {
         </div>
 
         <input
+          aria-label="Valor do serviço em reais"
           type="text"
           inputMode="numeric"
           value={form.preco === '' ? '' : formatarMoeda(form.preco)}
@@ -117,8 +119,8 @@ export function StockForm({ onSalvar }) {
         />
 
         {/* Linha 3 — serviço */}
-        <input value={form.defeito} onChange={set('defeito')} placeholder="Defeito relatado" />
-        <input value={form.tecnico} onChange={set('tecnico')} placeholder="Técnico responsável" />
+        <input aria-label="Defeito relatado" value={form.defeito} onChange={set('defeito')} placeholder="Defeito relatado" />
+        <input aria-label="Técnico responsável" value={form.tecnico} onChange={set('tecnico')} placeholder="Técnico responsável" />
 
         {/* Foto + Salvar */}
         <input

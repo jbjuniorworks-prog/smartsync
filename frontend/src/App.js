@@ -193,6 +193,7 @@ function App() {
             </svg>
             <input
               className="main-search"
+              aria-label="Buscar aparelho, IMEI, CPF, telefone ou cliente"
               placeholder="Buscar por aparelho, IMEI, CPF, telefone ou cliente..."
               value={busca}
               onChange={e => setBusca(e.target.value)}
@@ -204,7 +205,7 @@ function App() {
               </span>
             )}
             {busca && (
-              <button className="btn-clear-search" onClick={() => setBusca('')}>✕</button>
+              <button className="btn-clear-search" aria-label="Limpar busca" onClick={() => setBusca('')}>✕</button>
             )}
           </div>
           <select
