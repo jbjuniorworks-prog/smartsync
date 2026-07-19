@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { login } from '../api';
 
 export function LoginForm({ onLogin }) {
@@ -6,6 +6,14 @@ export function LoginForm({ onLogin }) {
   const [senha, setSenha]   = useState('');
   const [erro, setErro]     = useState('');
   const [loading, setLoading] = useState(false);
+  const [lento, setLento]   = useState(false);
+
+  // o backend no plano free "dorme" — avisa se a conexão estiver demorando
+  useEffect(() => {
+    if (!loading) { setLento(false); return; }
+    const t = setTimeout(() => setLento(true), 4000);
+    return () => clearTimeout(t);
+  }, [loading]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,6 +76,12 @@ export function LoginForm({ onLogin }) {
         <button type="submit" disabled={loading}>
           {loading ? <span className="btn-spinner" /> : 'Entrar'}
         </button>
+
+        {lento && loading && (
+          <p className="login-hint-lento">
+            Conectando ao servidor… a primeira conexão do dia pode levar até 1 minuto.
+          </p>
+        )}
 
         <div className="login-perfis">
           <div className="perfil-info">

@@ -25,15 +25,21 @@ export const formatarData = (data) => {
 };
 
 export const comprimirImagem = (file, maxWidth = 400) =>
-  new Promise((resolve) => {
+  new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     const img = new Image();
+    const url = URL.createObjectURL(file);
     img.onload = () => {
       const ratio = maxWidth / img.width;
       canvas.width = maxWidth;
       canvas.height = img.height * ratio;
       canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
       resolve(canvas.toDataURL('image/jpeg', 0.7));
     };
-    img.src = URL.createObjectURL(file);
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Não foi possível ler a imagem.'));
+    };
+    img.src = url;
   });

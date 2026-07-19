@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { toast } from 'sonner';
 import { comprimirImagem, validarImei } from '../utils/formatters';
 
 export function StockForm({ onSalvar }) {
@@ -47,8 +48,14 @@ export function StockForm({ onSalvar }) {
     const file = e.target.files[0];
     if (!file) return;
     setNomeArquivo(file.name);
-    const comprimida = await comprimirImagem(file);
-    setFoto(comprimida);
+    try {
+      const comprimida = await comprimirImagem(file);
+      setFoto(comprimida);
+    } catch (err) {
+      setFoto('');
+      setNomeArquivo('');
+      toast.error('Não foi possível ler essa imagem. Tente outra foto.');
+    }
   };
 
   const handleSubmit = async (e) => {

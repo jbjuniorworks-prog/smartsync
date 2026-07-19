@@ -51,6 +51,14 @@ function App() {
     if (user) sincronizar();
   }, [user, sincronizar]);
 
+  // avisa se a sincronização estiver demorando (cold start do servidor free)
+  const [syncLento, setSyncLento] = useState(false);
+  useEffect(() => {
+    if (!loading) { setSyncLento(false); return; }
+    const t = setTimeout(() => setSyncLento(true), 5000);
+    return () => clearTimeout(t);
+  }, [loading]);
+
   const isAdmin = user?.papel === 'admin';
 
   const handleSalvar = async (novoAparelho, foto) => {
@@ -68,7 +76,7 @@ function App() {
 
   const handleVender = async (id, clienteVenda) => {
     const resultado = await venderAparelho(id, clienteVenda);
-    if (resultado.ok) toast.success(`Registrado para ${clienteVenda}!`);
+    if (resultado.ok) toast.success(`Serviço concluído — entregue a ${clienteVenda}!`);
     else toast.error(`Erro: ${resultado.mensagem}`);
   };
 
@@ -247,7 +255,11 @@ function App() {
       {loading && (
         <div className="loading-wrap">
           <div className="loading-spinner" />
-          <p className="loading-text">Buscando...</p>
+          <p className="loading-text">
+            {syncLento
+              ? 'Conectando ao servidor… a primeira conexão do dia pode demorar um pouco.'
+              : 'Carregando aparelhos...'}
+          </p>
         </div>
       )}
 

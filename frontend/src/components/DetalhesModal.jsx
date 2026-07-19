@@ -66,6 +66,13 @@ export function DetalhesModal({ item, onClose, onAtualizar, isAdmin, buscarHisto
 
   const concluido = item.status === 'Vendido';
 
+  // fecha com Esc
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
   // Carrega histórico do aparelho
   useEffect(() => {
     if (abaAtiva === 'historico' && buscarHistorico) {

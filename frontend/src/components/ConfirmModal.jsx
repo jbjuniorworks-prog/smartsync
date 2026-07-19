@@ -1,4 +1,13 @@
+import { useEffect } from 'react';
+
 export function ConfirmModal({ mensagem, onConfirmar, onCancelar }) {
+  // fecha com Esc
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onCancelar(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onCancelar]);
+
   return (
     <div className="modal-overlay" onClick={onCancelar}>
       <div className="confirm-box" onClick={e => e.stopPropagation()}>
