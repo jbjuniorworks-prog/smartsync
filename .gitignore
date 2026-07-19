@@ -1,0 +1,17 @@
+# dependências
+node_modules/
+
+# variáveis de ambiente (NUNCA versionar)
+.env
+.env.local
+.env.*.local
+
+# dados sensíveis — não versionar
+dados.json
+
+# build do frontend
+build/
+
+# sistema
+.DS_Store
+Thumbs.db
