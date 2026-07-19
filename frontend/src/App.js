@@ -91,15 +91,16 @@ function App() {
 
   const tipoBusca = useMemo(() => {
     const limpo = busca.replace(/\D/g, '');
-    if (limpo.length === 11) return 'cpf';
     if (limpo.length === 15) return 'imei';
+    // CPF (11) e telefone (10-11) têm o mesmo tamanho — tratamos como "documento"
+    if (limpo.length >= 10 && limpo.length <= 11) return 'documento';
     return 'texto';
   }, [busca]);
 
   const badgeBusca = useMemo(() => {
     if (!busca.trim()) return null;
-    if (tipoBusca === 'cpf')  return { label: 'CPF',  cor: 'badge-cpf'  };
-    if (tipoBusca === 'imei') return { label: 'IMEI', cor: 'badge-imei' };
+    if (tipoBusca === 'documento') return { label: 'CPF/Tel', cor: 'badge-cpf'  };
+    if (tipoBusca === 'imei')      return { label: 'IMEI',    cor: 'badge-imei' };
     return { label: 'Texto', cor: 'badge-texto' };
   }, [busca, tipoBusca]);
 
@@ -109,12 +110,15 @@ function App() {
       .filter(i => {
         if (!busca.trim()) return true;
         const q = busca.toLowerCase().trim();
-        const cpfLimpo = busca.replace(/\D/g, '');
+        const num = busca.replace(/\D/g, '');
         return (
           i.aparelho?.toLowerCase().includes(q) ||
           i.imei?.includes(q) ||
           i.cliente?.toLowerCase().includes(q) ||
-          (cpfLimpo.length >= 6 && i.cpf?.replace(/\D/g, '').includes(cpfLimpo))
+          (num.length >= 6 && (
+            i.cpf?.replace(/\D/g, '').includes(num) ||
+            i.telefone?.replace(/\D/g, '').includes(num)
+          ))
         );
       });
 
@@ -189,7 +193,7 @@ function App() {
             </svg>
             <input
               className="main-search"
-              placeholder="Buscar por aparelho, IMEI, CPF ou nome do cliente..."
+              placeholder="Buscar por aparelho, IMEI, CPF, telefone ou cliente..."
               value={busca}
               onChange={e => setBusca(e.target.value)}
               autoComplete="off"
@@ -215,7 +219,7 @@ function App() {
           </select>
         </div>
         <p className="search-hint">
-          Busque por <strong>aparelho</strong>, <strong>IMEI</strong> (15 dígitos), <strong>CPF</strong> (11 dígitos) ou <strong>nome do cliente</strong>
+          Busque por <strong>aparelho</strong>, <strong>IMEI</strong>, <strong>CPF</strong>, <strong>telefone</strong> ou <strong>nome do cliente</strong>
         </p>
       </div>
 
@@ -235,22 +239,27 @@ function App() {
         )}
       </div>
 
-      {!loading && tipoBusca === 'cpf' && estoqueFiltrado.length > 0 && (
-        <div className="cpf-cliente-banner">
-          <div className="cpf-cliente-avatar">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-            </svg>
+      {!loading && tipoBusca === 'documento' && estoqueFiltrado.length > 0 && (() => {
+        const c = estoqueFiltrado[0];
+        const docs = [c.cpf && `CPF ${c.cpf}`, c.telefone && `Tel ${c.telefone}`]
+          .filter(Boolean).join(' · ');
+        return (
+          <div className="cpf-cliente-banner">
+            <div className="cpf-cliente-avatar">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div className="cpf-cliente-info">
+              <strong>{c.cliente || 'Cliente sem nome cadastrado'}</strong>
+              <span>
+                {docs || `Nº ${busca}`} · {estoqueFiltrado.length}{' '}
+                {estoqueFiltrado.length === 1 ? 'aparelho' : 'aparelhos'} deste cliente
+              </span>
+            </div>
           </div>
-          <div className="cpf-cliente-info">
-            <strong>{estoqueFiltrado[0].cliente || 'Cliente sem nome cadastrado'}</strong>
-            <span>
-              CPF {estoqueFiltrado[0].cpf || busca} · {estoqueFiltrado.length}{' '}
-              {estoqueFiltrado.length === 1 ? 'aparelho' : 'aparelhos'} deste cliente
-            </span>
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       {loading && (
         <div className="loading-wrap">

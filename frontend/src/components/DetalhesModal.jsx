@@ -195,10 +195,14 @@ export function DetalhesModal({ item, onClose, onAtualizar, isAdmin, buscarHisto
               {editando === 'preco' && (
                 <div className="detalhe-edit">
                   <input
-                    type="number"
-                    value={dados.preco}
+                    type="text"
+                    inputMode="numeric"
+                    value={dados.preco === '' || dados.preco == null ? '' : formatarMoeda(dados.preco)}
                     autoFocus
-                    onChange={e => setDados(prev => ({ ...prev, preco: e.target.value }))}
+                    onChange={e => {
+                      const d = e.target.value.replace(/\D/g, '');
+                      setDados(prev => ({ ...prev, preco: d ? Number(d) / 100 : '' }));
+                    }}
                     onKeyDown={e => e.key === 'Enter' && salvarCampo('preco')}
                   />
                   <div className="detalhe-edit-btns">

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { toast } from 'sonner';
-import { comprimirImagem, validarImei } from '../utils/formatters';
+import { comprimirImagem, validarImei, formatarMoeda } from '../utils/formatters';
 
 export function StockForm({ onSalvar }) {
   const [form, setForm] = useState({
@@ -34,6 +34,12 @@ export function StockForm({ onSalvar }) {
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
     setForm({ ...form, cpf: fmt });
+  };
+
+  // máscara de moeda: os dígitos digitados entram como centavos (ex.: 150000 → R$ 1.500,00)
+  const handlePreco = (e) => {
+    const digitos = e.target.value.replace(/\D/g, '');
+    setForm({ ...form, preco: digitos ? Number(digitos) / 100 : '' });
   };
 
   const handleTelefone = (e) => {
@@ -78,15 +84,15 @@ export function StockForm({ onSalvar }) {
         <h2>Cadastrar aparelho</h2>
         <p className="form-sub">
           Registre a entrada do aparelho. Campos com <strong>*</strong> são obrigatórios ·
-          preencha o <strong>CPF</strong> para localizar o cliente depois pela busca.
+          informe <strong>CPF ou telefone</strong> do cliente para localizá-lo depois pela busca.
         </p>
       </div>
       <form onSubmit={handleSubmit} className="grid-form">
 
         {/* Linha 1 — dados do cliente */}
         <input value={form.cliente} onChange={set('cliente')} placeholder="Cliente *" />
-        <input value={form.cpf} onChange={handleCpf} placeholder="CPF (recomendado)" />
-        <input value={form.telefone} onChange={handleTelefone} placeholder="Telefone (opcional)" />
+        <input value={form.cpf} onChange={handleCpf} placeholder="CPF (p/ localizar)" />
+        <input value={form.telefone} onChange={handleTelefone} placeholder="Telefone (p/ localizar)" />
 
         {/* Linha 2 — dados do aparelho */}
         <input value={form.aparelho} onChange={set('aparelho')} placeholder="Aparelho *" />
@@ -103,10 +109,11 @@ export function StockForm({ onSalvar }) {
         </div>
 
         <input
-          type="number"
-          value={form.preco}
-          onChange={set('preco')}
-          placeholder="R$ *"
+          type="text"
+          inputMode="numeric"
+          value={form.preco === '' ? '' : formatarMoeda(form.preco)}
+          onChange={handlePreco}
+          placeholder="R$ 0,00 *"
         />
 
         {/* Linha 3 — serviço */}
