@@ -125,7 +125,7 @@ export function StockCard({ item, onAlterarStatus, onVender, onExcluir, onImprim
             <circle cx="12" cy="12" r="10"/>
             <polyline points="12 6 12 12 16 14"/>
           </svg>
-          Ver histórico de serviços
+          Clique para ver detalhes e histórico
         </div>
       </div>
 

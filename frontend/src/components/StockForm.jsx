@@ -67,12 +67,18 @@ export function StockForm({ onSalvar }) {
 
   return (
     <div className="form-card">
-      <h2>Cadastrar aparelho</h2>
+      <div className="form-head">
+        <h2>Cadastrar aparelho</h2>
+        <p className="form-sub">
+          Registre a entrada do aparelho. Campos com <strong>*</strong> são obrigatórios ·
+          preencha o <strong>CPF</strong> para localizar o cliente depois pela busca.
+        </p>
+      </div>
       <form onSubmit={handleSubmit} className="grid-form">
 
         {/* Linha 1 — dados do cliente */}
         <input value={form.cliente} onChange={set('cliente')} placeholder="Cliente *" />
-        <input value={form.cpf} onChange={handleCpf} placeholder="CPF (opcional)" />
+        <input value={form.cpf} onChange={handleCpf} placeholder="CPF (recomendado)" />
         <input value={form.telefone} onChange={handleTelefone} placeholder="Telefone (opcional)" />
 
         {/* Linha 2 — dados do aparelho */}

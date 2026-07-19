@@ -227,6 +227,23 @@ function App() {
         )}
       </div>
 
+      {!loading && tipoBusca === 'cpf' && estoqueFiltrado.length > 0 && (
+        <div className="cpf-cliente-banner">
+          <div className="cpf-cliente-avatar">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div className="cpf-cliente-info">
+            <strong>{estoqueFiltrado[0].cliente || 'Cliente sem nome cadastrado'}</strong>
+            <span>
+              CPF {estoqueFiltrado[0].cpf || busca} · {estoqueFiltrado.length}{' '}
+              {estoqueFiltrado.length === 1 ? 'aparelho' : 'aparelhos'} deste cliente
+            </span>
+          </div>
+        </div>
+      )}
+
       {loading && (
         <div className="loading-wrap">
           <div className="loading-spinner" />

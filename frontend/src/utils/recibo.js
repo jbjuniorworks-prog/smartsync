@@ -1,3 +1,7 @@
+// Nome da loja impresso no recibo. Ainda não definido — ajuste aqui,
+// ou defina REACT_APP_LOJA_NOME no Vercel (não precisa mexer no código).
+const NOME_LOJA = process.env.REACT_APP_LOJA_NOME || 'CenterCel';
+
 // escapa texto do usuário antes de injetar no HTML da janela de impressão
 const esc = (v) =>
   String(v ?? '')
@@ -21,7 +25,7 @@ export const imprimirRecibo = (item, formatarMoeda) => {
 
   const html = '<html><head><title>Recibo - SmartSync</title><style>' + estilos + '</style></head>'
     + '<body>'
-    + '<h1>CENTERCEL</h1>'
+    + '<h1>' + esc(NOME_LOJA.toUpperCase()) + '</h1>'
     + '<p>Comprovante de Serviço / Garantia</p>'
     + '<div class="info">'
     + '<p><strong>CLIENTE:</strong> ' + esc(cliente) + '</p>'
