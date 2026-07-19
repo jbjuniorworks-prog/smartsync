@@ -123,14 +123,31 @@ app.post('/api/salvar', autenticar, rota(async (req, res) => {
 
   let clienteId = null;
   if (cliente) {
+    // localiza um cliente já existente pelo identificador que veio (CPF ou telefone),
+    // priorizando o CPF. Assim o mesmo cliente não é duplicado a cada cadastro.
+    let existenteCliente = null;
     if (cpf) {
-      const { data: cd, error: ce } = await supabase.from('clientes')
-        .upsert({ nome: cliente, cpf, telefone: telefone || null }, { onConflict: 'cpf' })
-        .select().single();
-      if (!ce) clienteId = cd?.id;
+      const { data } = await supabase.from('clientes').select('id, cpf, telefone').eq('cpf', cpf).limit(1);
+      existenteCliente = data?.[0] || null;
+    }
+    if (!existenteCliente && telefone) {
+      const { data } = await supabase.from('clientes').select('id, cpf, telefone').eq('telefone', telefone).limit(1);
+      existenteCliente = data?.[0] || null;
+    }
+
+    if (existenteCliente) {
+      clienteId = existenteCliente.id;
+      // completa só o que estiver faltando — nunca sobrescreve o nome já cadastrado
+      const patch = {};
+      if (cpf && !existenteCliente.cpf)           patch.cpf = cpf;
+      if (telefone && !existenteCliente.telefone) patch.telefone = telefone;
+      if (Object.keys(patch).length) {
+        await supabase.from('clientes').update(patch).eq('id', clienteId);
+      }
     } else {
       const { data: novo } = await supabase.from('clientes')
-        .insert({ nome: cliente, telefone: telefone || null }).select().single();
+        .insert({ nome: cliente, cpf: cpf || null, telefone: telefone || null })
+        .select().single();
       clienteId = novo?.id;
     }
   }
