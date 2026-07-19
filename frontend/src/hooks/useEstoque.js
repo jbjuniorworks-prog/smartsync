@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-
-const API_URL = process.env.REACT_APP_API_URL || 'https://smartsync-api-1.onrender.com/api';
+import { apiFetch } from '../api';
 
 export function useEstoque() {
   const [meuEstoque, setMeuEstoque] = useState([]);
@@ -9,8 +8,8 @@ export function useEstoque() {
   const sincronizar = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/sincronizar`);
-      if (!res.ok) throw new Error(`Erro ${res.status}: ${res.statusText}`);
+      const res = await apiFetch('/sincronizar');
+      if (!res.ok) throw new Error(`Erro ${res.status}`);
       const dados = await res.json();
       setMeuEstoque(dados.minhaLoja || []);
     } catch (err) {
@@ -22,16 +21,12 @@ export function useEstoque() {
 
   const salvarAparelho = async (novoAparelho, foto) => {
     try {
-      const res = await fetch(`${API_URL}/salvar`, {
+      const res = await apiFetch('/salvar', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...novoAparelho, foto }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        const mensagem = data.mensagem || data.message || data.error || `Erro ${res.status}`;
-        throw new Error(mensagem);
-      }
+      if (!res.ok) throw new Error(data.mensagem || data.message || `Erro ${res.status}`);
       await sincronizar();
       return { ok: true };
     } catch (err) {
@@ -42,9 +37,8 @@ export function useEstoque() {
 
   const alterarStatus = async (id, statusAtual) => {
     try {
-      const res = await fetch(`${API_URL}/estoque/${id}`, {
+      const res = await apiFetch(`/estoque/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: statusAtual === 'Vendido' ? 'Em estoque' : 'Vendido' }),
       });
       if (!res.ok) throw new Error(`Erro ${res.status}`);
@@ -56,14 +50,9 @@ export function useEstoque() {
 
   const venderAparelho = async (id, clienteVenda) => {
     try {
-      const res = await fetch(`${API_URL}/estoque/${id}`, {
+      const res = await apiFetch(`/estoque/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          status: 'Vendido',
-          clienteVenda,
-          dataVenda: new Date().toISOString(),
-        }),
+        body: JSON.stringify({ status: 'Vendido', clienteVenda, dataVenda: new Date().toISOString() }),
       });
       if (!res.ok) throw new Error(`Erro ${res.status}`);
       await sincronizar();
@@ -76,7 +65,7 @@ export function useEstoque() {
 
   const excluirAparelho = async (id) => {
     try {
-      const res = await fetch(`${API_URL}/estoque/${id}`, { method: 'DELETE' });
+      const res = await apiFetch(`/estoque/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error(`Erro ${res.status}`);
       await sincronizar();
     } catch (err) {
@@ -86,7 +75,7 @@ export function useEstoque() {
 
   const buscarHistorico = async (aparelhoId) => {
     try {
-      const res = await fetch(`${API_URL}/historico/${aparelhoId}`);
+      const res = await apiFetch(`/historico/${aparelhoId}`);
       if (!res.ok) throw new Error(`Erro ${res.status}`);
       return await res.json();
     } catch (err) {
@@ -97,7 +86,7 @@ export function useEstoque() {
 
   const buscarPorCpf = async (cpf) => {
     try {
-      const res = await fetch(`${API_URL}/clientes/cpf/${cpf}`);
+      const res = await apiFetch(`/clientes/cpf/${cpf}`);
       if (!res.ok) throw new Error(`Erro ${res.status}`);
       return await res.json();
     } catch (err) {
@@ -106,10 +95,9 @@ export function useEstoque() {
     }
   };
 
-  // ── NOVO: buscar todos os aparelhos de um cliente pelo clienteId ──
   const buscarAparelhosDoCliente = async (clienteId) => {
     try {
-      const res = await fetch(`${API_URL}/clientes/${clienteId}/aparelhos`);
+      const res = await apiFetch(`/clientes/${clienteId}/aparelhos`);
       if (!res.ok) throw new Error(`Erro ${res.status}`);
       return await res.json();
     } catch (err) {

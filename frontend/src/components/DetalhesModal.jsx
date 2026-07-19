@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { formatarMoeda, formatarData } from '../utils/formatters';
-
-const API_URL = process.env.REACT_APP_API_URL || 'https://smartsync-api-1.onrender.com/api';
+import { apiFetch } from '../api';
 
 const LABELS_CAMPO = {
   cadastro:          'Cadastro no sistema',
@@ -88,14 +87,19 @@ export function DetalhesModal({ item, onClose, onAtualizar, isAdmin, buscarHisto
 
   const salvarCampo = async (campo) => {
     setSalvando(true);
-    await fetch(`${API_URL}/estoque/${item.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ [campo]: dados[campo] }),
-    });
-    await onAtualizar();
-    setEditando(null);
-    setSalvando(false);
+    try {
+      const res = await apiFetch(`/estoque/${item.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ [campo]: dados[campo] }),
+      });
+      if (!res.ok) throw new Error(`Erro ${res.status}`);
+      await onAtualizar();
+      setEditando(null);
+    } catch (err) {
+      console.error('Erro ao salvar campo:', err);
+    } finally {
+      setSalvando(false);
+    }
   };
 
   const renderCampo = (label, campo, tipo = 'text') => (

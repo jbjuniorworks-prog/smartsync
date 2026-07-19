@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import './App.css';
+import { getUsuario, limparSessao } from './api';
 import { Toaster, toast } from 'sonner';
 import { useEstoque } from './hooks/useEstoque';
 import { formatarMoeda } from './utils/formatters';
@@ -29,22 +30,21 @@ function App() {
     buscarAparelhosDoCliente,
   } = useEstoque();
 
-  const [user, setUser] = useState(() => {
-    try {
-      const salvo = sessionStorage.getItem('usuario_logado');
-      return salvo ? JSON.parse(salvo) : null;
-    } catch { return null; }
-  });
+  const [user, setUser] = useState(() => getUsuario());
 
-  const handleLogin = (usuario) => {
-    setUser(usuario);
-    try { sessionStorage.setItem('usuario_logado', JSON.stringify(usuario)); } catch {}
-  };
+  const handleLogin = (usuario) => setUser(usuario);
 
   const handleLogout = () => {
+    limparSessao();
     setUser(null);
-    try { sessionStorage.removeItem('usuario_logado'); } catch {}
   };
+
+  // desloga automaticamente se o token expirar (evento disparado pelo api.js no 401)
+  useEffect(() => {
+    const aoExpirar = () => setUser(null);
+    window.addEventListener('smartsync:naoautenticado', aoExpirar);
+    return () => window.removeEventListener('smartsync:naoautenticado', aoExpirar);
+  }, []);
 
   const isAdmin = user?.papel === 'admin';
 

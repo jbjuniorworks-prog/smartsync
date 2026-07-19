@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-
-const USUARIOS = [
-  { id: 1, nome: 'Admin',    senha: 'admin123',    papel: 'admin'    },
-  { id: 2, nome: 'Vendedor', senha: 'vend123',     papel: 'vendedor' },
-];
+import { login } from '../api';
 
 export function LoginForm({ onLogin }) {
   const [nome, setNome]     = useState('');
@@ -15,18 +11,14 @@ export function LoginForm({ onLogin }) {
     e.preventDefault();
     setErro('');
     setLoading(true);
-    await new Promise(r => setTimeout(r, 400));
-
-    const usuario = USUARIOS.find(
-      u => u.nome.toLowerCase() === nome.trim().toLowerCase() && u.senha === senha
-    );
-
-    if (usuario) {
+    try {
+      const usuario = await login(nome.trim(), senha);
       onLogin(usuario);
-    } else {
-      setErro('Usuário ou senha incorretos.');
+    } catch (err) {
+      setErro(err.message || 'Usuário ou senha incorretos.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
