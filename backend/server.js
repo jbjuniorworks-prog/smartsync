@@ -30,6 +30,10 @@ app.use(express.json({ limit: '10mb' }));
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
+// hash descartável: usado no login quando o usuário não existe, para o bcrypt.compare
+// rodar sempre (tempo ~constante) e não vazar por timing se um nome está cadastrado.
+const HASH_FICTICIO = bcrypt.hashSync('smartsync-usuario-inexistente', 10);
+
 // ── helpers ──
 const validarImeiReal = (imei) => {
   const n = String(imei).trim();
@@ -79,7 +83,9 @@ app.post('/api/login', rota(async (req, res) => {
   const { data: u } = await supabase
     .from('usuarios').select('*').ilike('nome', String(nome).trim()).maybeSingle();
 
-  if (!u || !(await bcrypt.compare(String(senha), u.senha_hash))) {
+  // compara sempre (usa hash fictício se o usuário não existe) para não vazar por timing
+  const senhaConfere = await bcrypt.compare(String(senha), u?.senha_hash || HASH_FICTICIO);
+  if (!u || !senhaConfere) {
     return res.status(401).json({ mensagem: 'Usuário ou senha incorretos' });
   }
 
@@ -111,6 +117,10 @@ app.post('/api/salvar', autenticar, rota(async (req, res) => {
   if (!aparelho || !imei || !preco) return res.status(400).json({ mensagem: 'Campos obrigatórios: aparelho, imei, preco' });
   if (!validarImeiReal(imei)) return res.status(400).json({ mensagem: 'IMEI inválido' });
 
+  // valida o IMEI duplicado antes de tocar em clientes (evita cliente órfão em caso de erro)
+  const { data: existente } = await supabase.from('aparelhos').select('id').eq('imei', String(imei).trim()).maybeSingle();
+  if (existente) return res.status(400).json({ mensagem: 'IMEI já cadastrado!' });
+
   let clienteId = null;
   if (cliente) {
     if (cpf) {
@@ -124,9 +134,6 @@ app.post('/api/salvar', autenticar, rota(async (req, res) => {
       clienteId = novo?.id;
     }
   }
-
-  const { data: existente } = await supabase.from('aparelhos').select('id').eq('imei', String(imei).trim()).maybeSingle();
-  if (existente) return res.status(400).json({ mensagem: 'IMEI já cadastrado!' });
 
   const { data: novoAparelho, error } = await supabase.from('aparelhos').insert({
     cliente_id: clienteId, imei: String(imei).trim(), nome_aparelho: aparelho.trim(),
@@ -159,11 +166,19 @@ app.put('/api/estoque/:id', autenticar, apenasAdmin, rota(async (req, res) => {
   if (dados.status === 'Vendido')     { atualizacao.data_venda = dados.dataVenda || new Date().toISOString(); atualizacao.cliente_venda = dados.clienteVenda || null; }
   if (dados.status === 'Em estoque')  { atualizacao.data_venda = null; atualizacao.cliente_venda = null; }
 
+  // captura os valores atuais para registrar o "de → para" na timeline do histórico
+  const { data: anterior } = await supabase.from('aparelhos').select('*').eq('id', id).maybeSingle();
+
   const { data, error } = await supabase.from('aparelhos').update(atualizacao).eq('id', id).select().single();
   if (error) return res.status(500).json({ mensagem: error.message });
 
   for (const [campo, valor] of Object.entries(atualizacao)) {
-    await supabase.from('historico').insert({ aparelho_id: id, usuario: req.user.nome, campo_alterado: campo, valor_novo: String(valor) });
+    const antigo = anterior?.[campo];
+    await supabase.from('historico').insert({
+      aparelho_id: id, usuario: req.user.nome, campo_alterado: campo,
+      valor_anterior: antigo === undefined || antigo === null ? null : String(antigo),
+      valor_novo: String(valor),
+    });
   }
   res.json(data);
 }));
