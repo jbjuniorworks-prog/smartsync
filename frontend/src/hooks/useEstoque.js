@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { apiFetch } from '../api';
 
 export function useEstoque() {
@@ -105,8 +105,6 @@ export function useEstoque() {
       return [];
     }
   };
-
-  useEffect(() => { sincronizar(); }, [sincronizar]);
 
   return {
     meuEstoque, loading, sincronizar,

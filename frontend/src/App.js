@@ -46,6 +46,11 @@ function App() {
     return () => window.removeEventListener('smartsync:naoautenticado', aoExpirar);
   }, []);
 
+  // sincroniza o estoque sempre que há um usuário autenticado (boot com sessão ou após login)
+  useEffect(() => {
+    if (user) sincronizar();
+  }, [user, sincronizar]);
+
   const isAdmin = user?.papel === 'admin';
 
   const handleSalvar = async (novoAparelho, foto) => {

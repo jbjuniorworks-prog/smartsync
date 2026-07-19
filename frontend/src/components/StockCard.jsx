@@ -15,7 +15,7 @@ const mascaraImei = (imei, isAdmin) => {
   return `••••••••••• ${imei.slice(-4)}`;
 };
 
-export function StockCard({ item, onAlterarStatus, onVender, onExcluir, onImprimir, onAtualizar, isAdmin, buscarHistorico }) {
+export function StockCard({ item, onAlterarStatus, onVender, onExcluir, onImprimir, onAtualizar, isAdmin, buscarHistorico, buscarAparelhosDoCliente }) {
   const [detalheAberto, setDetalheAberto] = useState(false);
   const [vendaAberta, setVendaAberta] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
@@ -136,6 +136,7 @@ export function StockCard({ item, onAlterarStatus, onVender, onExcluir, onImprim
           onAtualizar={onAtualizar}
           isAdmin={isAdmin}
           buscarHistorico={buscarHistorico}
+          buscarAparelhosDoCliente={buscarAparelhosDoCliente}
         />
       )}
 
