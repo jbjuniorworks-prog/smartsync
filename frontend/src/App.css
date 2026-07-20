@@ -267,8 +267,8 @@ body {
 .login-perfis {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding-top: 12px;
+  gap: 11px;
+  padding-top: 14px;
   border-top: 1px solid var(--border);
   margin-top: 4px;
 }
@@ -280,9 +280,9 @@ body {
 }
 
 .perfil-badge {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  padding: 4px 12px;
+  padding: 4px 13px;
   border-radius: 99px;
   white-space: nowrap;
   letter-spacing: 0.03em;
@@ -302,9 +302,9 @@ body {
 }
 
 .perfil-desc {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: var(--text-muted);
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 /* ==========================================================================
